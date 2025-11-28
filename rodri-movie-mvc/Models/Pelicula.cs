@@ -19,10 +19,13 @@ namespace rodri_movie_mvc.Models
         public string Sinopsis { get; set; }
         [Required]
         [Url]
+        [Display(Name = "Imagen")]
         public string PosterUrlPortada { get; set; }
+        [Display(Name = "Género")]
         public int GeneroId { get; set; }
         public Genero? Genero { get; set; }
         public int PlataformaId { get; set; }
+        [Display(Name = "Plataforma")]
         public Plataforma? Plataforma { get; set; }
         [NotMapped]
         public int PromedioRating { get; set; }

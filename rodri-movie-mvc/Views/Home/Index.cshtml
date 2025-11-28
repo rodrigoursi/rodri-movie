@@ -1,8 +1,47 @@
-﻿@{
+﻿@model List<Pelicula>
+@{
     ViewData["Title"] = "Home Page";
+    var total = ViewBag.TotalPag;
+    var actual = ViewBag.PaginaActual;
+    var fraseBuscar = ViewBag.FraseBuscar is null ? "" : ViewBag.FraseBuscar;
+    var generos = ViewBag.Generos;
+    var generoId = ViewBag.GeneroId;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<form class="d-flex gap-3 mb-4" asp-action="Index" method="get">
+    <div class="input-group">
+        <button class="btn btn-outline-secondary" type="submit" id="button-addon1">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <input type="text" class="form-control" name="fraseBuscar" value="@fraseBuscar" aria-label="Example text with button addon" aria-describedby="button-addon1">
+    </div>
+    <select class="form-select w-25" aria-label="Default select example" onchange="this.form.submit()" name="genero" asp-items="@generos"></select>
+</form>
+
+
+<section class="d-flex flex-wrap gap-3">
+    @foreach (var peli in Model)
+    {
+        <div class="card" style="width: 16rem;">
+            <img src="@peli.PosterUrlPortada" class="card-img-top" alt="...">
+            <div class="card-body">
+                <p class="card-text">@peli.Titulo</p>
+                <p class="card-text"><span class="me-1">2.5</span><i class="fa-solid fa-star"></i></p>
+            </div>
+        </div>
+    }
+</section>
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pagina="@(actual - 1)" asp-route-fraseBuscar="@fraseBuscar" asp-route-genero="@generoId">Anterior</a></li>
+        @for (int i = 0; i < total; i++)
+        {
+            <li class="page-item @(actual == (i + 1) ? "active" : "")"><a class="page-link" asp-action="Index" asp-route-pagina="@(i + 1)" asp-route-fraseBuscar="@fraseBuscar" asp-route-genero="@generoId">@(i + 1)</a></li>
+        }
+        
+        @* <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li> *@
+        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pagina="@(actual + 1)" asp-route-fraseBuscar="@fraseBuscar" asp-route-genero="@generoId">Siguiente</a></li>
+    </ul>
+</nav>
+
