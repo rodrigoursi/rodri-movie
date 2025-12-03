@@ -1,0 +1,87 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model UsuarioViewModel
+@{
+}
+
+<style>
+    /* From Uiverse.io by Yaya12085 */
+    .form {
+        max-width: 320px;
+        width: 100%;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0px 0px 0px 4px rgba(52, 52, 53, 0.185);
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: #1a202c;
+    }
+
+    .label {
+        color: rgb(0, 0, 0);
+        margin-bottom: 4px;
+    }
+
+    .input {
+        padding: 10px;
+        margin-bottom: 20px;
+        width: 100%;
+        font-size: 1rem;
+        color: #4a5568;
+        outline: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .input:focus {
+        background-color: #fff;
+        box-shadow: 0 0 0 2px #cbd5e0;
+    }
+
+    .input:valid {
+        border: 1px solid green;
+    }
+
+    .input:invalid {
+        border: 1px solid rgba(14, 14, 14, 0.205);
+    }
+
+    .submit {
+        background-color: #1a202c;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+</style>
+
+<section class="d-flex justify-content-center">
+    <form asp-action="Registro" method="post" class="form">
+        <div asp-validation-summary="ModelOnly" class="text-bg-danger"></div>
+        <span class="title">Register</span>
+        <label asp-for="Nombre" class="label"></label>
+        <input asp-for="Nombre" type="text" name="Nombre" required="" class="input">
+        <label asp-for="Apellido" class="label"></label>
+        <input asp-for="Apellido" type="text" name="Apellido" required="" class="input">
+        <label asp-for="Email" class="label">Correo electrónico</label>
+        <input asp-for="Email" type="email" name="Email" required="" class="input">
+        <label asp-for="Clave" class="label">Contraseña</label>
+        <input asp-for="Clave" type="password" name="Clave" required="" class="input">
+        <label asp-for="ConfirmarClave" class="label">Confirmar contraseña</label>
+        <input asp-for="ConfirmarClave" type="password" id="password" name="ConfirmarClave" required="" class="input">
+        <button type="submit" class="submit">Registrarse</button>
+    </form>
+</section>
+

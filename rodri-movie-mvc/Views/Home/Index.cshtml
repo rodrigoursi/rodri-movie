@@ -22,13 +22,15 @@
 <section class="d-flex flex-wrap gap-3">
     @foreach (var peli in Model)
     {
-        <div class="card" style="width: 16rem;">
-            <img src="@peli.PosterUrlPortada" class="card-img-top" alt="...">
-            <div class="card-body">
-                <p class="card-text">@peli.Titulo</p>
-                <p class="card-text"><span class="me-1">2.5</span><i class="fa-solid fa-star"></i></p>
+        <a asp-action="Details" asp-route-id="@peli.Id" class="text-decoration-none">
+            <div class="card" style="width: 16rem;">
+                <img src="@peli.PosterUrlPortada" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <p class="card-text">@peli.Titulo</p>
+                    <p class="card-text"><span class="me-1">2.5</span><i class="fa-solid fa-star"></i></p>
+                </div>
             </div>
-        </div>
+        </a>
     }
 </section>
 <nav aria-label="Page navigation" class="mt-4">

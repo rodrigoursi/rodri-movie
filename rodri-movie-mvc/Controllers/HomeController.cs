@@ -68,6 +68,12 @@ namespace rodri_movie_mvc.Controllers
             return View(peliculas);
         }
 
+        public async Task<IActionResult> Details(int Id)
+        {
+            var Pelicula = await _context.Peliculas.Include(p => p.Genero).FirstOrDefaultAsync(p => p.Id == Id);
+            return View(Pelicula);
+        }
+
         public IActionResult Privacy()
         {
             return View();
