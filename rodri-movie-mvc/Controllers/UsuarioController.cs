@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using rodri_movie_mvc.Models;
 
@@ -84,9 +85,54 @@ namespace rodri_movie_mvc.Controllers
                 return View(usuario);
         }
 
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            return View();
+            if (_signInManager is null) return NotFound();
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Perfil()
+        {
+            if (_userManager is null) return NotFound();
+            var usuario = await _userManager.GetUserAsync(User);
+            PerfilViewModel usuarioPerfil = new PerfilViewModel();
+            usuarioPerfil.Nombre = usuario.Nombre;
+            usuarioPerfil.Apellido = usuario.Apellido;
+            usuarioPerfil.Email = usuario.Email;
+            return View(usuarioPerfil);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Perfil(PerfilViewModel usuarioVM)
+        {
+            if (_userManager is null) return NotFound();
+            if (ModelState.IsValid)
+            {
+                var usuario = await _userManager.GetUserAsync(User);
+                if(usuario == null) return NotFound();
+                usuario.Nombre = usuarioVM.Nombre;
+                usuario.Apellido = usuarioVM.Apellido;
+
+                var resultado = await _userManager.UpdateAsync(usuario);
+
+                if (resultado.Succeeded)
+                {
+                    ViewBag.Mensaje = "Perfil actualizado con éxito.";
+                    return View(usuarioVM);
+                }
+                else
+                {
+                    foreach (var error in resultado.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
+            }
+            return View(usuarioVM);
         }
 
 

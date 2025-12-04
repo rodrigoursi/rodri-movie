@@ -28,12 +28,13 @@ namespace rodri_movie_mvc.Models
         [StringLength(50)]
         public string Apellido { get; set; }
         [Required]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "El email debe ser valido")]
         public string Email { get; set; }
-        [PasswordPropertyText]
+        [DataType(DataType.Password)]
         [Required]
         public string Clave { get; set; }
-        [PasswordPropertyText]
+        [DataType(DataType.Password)]
+        [Required]
         public string ConfirmarClave { get; set; }
     }
 
@@ -42,8 +43,20 @@ namespace rodri_movie_mvc.Models
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-
+        [DataType(DataType.Password)]
         [Required]
         public string Clave { get; set; }
+    }
+
+    public class PerfilViewModel
+    {
+        [Required]
+        public string Nombre { get; set; }
+        [Required]
+        public string Apellido { get; set; }
+        [EmailAddress]
+        [Required]
+        public string? Email { get; set; }
+        public string? ImagenUrlPerfil { get; set; }
     }
 }
