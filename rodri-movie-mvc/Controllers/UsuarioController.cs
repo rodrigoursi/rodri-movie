@@ -13,13 +13,15 @@ namespace rodri_movie_mvc.Controllers
         private readonly SignInManager<Usuario>? _signInManager;
         private readonly RoleManager<IdentityRole>? _roleManager;
         private readonly ImagenStorage _imagenStorage;
+        private readonly IEmailService _emailService;
 
-        public UsuarioController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, RoleManager<IdentityRole> roleManager, ImagenStorage imagenStorage)
+        public UsuarioController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, RoleManager<IdentityRole> roleManager, ImagenStorage imagenStorage, IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _imagenStorage = imagenStorage;
+            _emailService = emailService;
         }
         public IActionResult Login()
         {
@@ -68,6 +70,7 @@ namespace rodri_movie_mvc.Controllers
             if (_signInManager is null) return NotFound();
             if (usuario == null) return NotFound();
             if (!validarClave(usuario.Clave, usuario.ConfirmarClave)) return NotFound();
+
             var nuevoUsuario = new Usuario();
             nuevoUsuario.UserName = usuario.Email;
             nuevoUsuario.Email = usuario.Email;
@@ -78,6 +81,7 @@ namespace rodri_movie_mvc.Controllers
 
             if(resultado.Succeeded)
             {
+                await _emailService.SendAsync(usuario.Email, "Bienvenido a Rodri Movie", "Gracias por registrarte");
                 await _signInManager.SignInAsync(nuevoUsuario, isPersistent: false);
                 return RedirectToAction("Index", "Home");
             } 

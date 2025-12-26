@@ -45,6 +45,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<ImagenStorage>();
 builder.Services.Configure<FormOptions>(options => { options.MultipartBodyLengthLimit = 2 * 1024 * 1024; });
 
+//Servicios de email
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
