@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using rodri_movie_mvc.Models;
+using rodri_movie_mvc.Service;
 
 namespace rodri_movie_mvc.Controllers
 {
@@ -9,11 +11,15 @@ namespace rodri_movie_mvc.Controllers
     {
         private readonly UserManager<Usuario>? _userManager;
         private readonly SignInManager<Usuario>? _signInManager;
+        private readonly RoleManager<IdentityRole>? _roleManager;
+        private readonly ImagenStorage _imagenStorage;
 
-        public UsuarioController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager)
+        public UsuarioController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, RoleManager<IdentityRole> roleManager, ImagenStorage imagenStorage)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
+            _imagenStorage = imagenStorage;
         }
         public IActionResult Login()
         {
@@ -101,6 +107,7 @@ namespace rodri_movie_mvc.Controllers
             usuarioPerfil.Nombre = usuario.Nombre;
             usuarioPerfil.Apellido = usuario.Apellido;
             usuarioPerfil.Email = usuario.Email;
+            usuarioPerfil.ImagenUrlPerfil = usuario.ImagenUrlPerfil;
             return View(usuarioPerfil);
         }
 
@@ -114,6 +121,23 @@ namespace rodri_movie_mvc.Controllers
             {
                 var usuario = await _userManager.GetUserAsync(User);
                 if(usuario == null) return NotFound();
+
+                try
+                {
+                    if (usuarioVM.ImagenFilePerfil is not null && usuarioVM.ImagenFilePerfil.Length > 0)
+                    {
+                        var ruta = await _imagenStorage.SaveAsync(usuario.Id, usuarioVM.ImagenFilePerfil);
+                        usuario.ImagenUrlPerfil = ruta;
+                        usuarioVM.ImagenUrlPerfil = ruta;
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                    return View(usuarioVM);
+                }
+
                 usuario.Nombre = usuarioVM.Nombre;
                 usuario.Apellido = usuarioVM.Apellido;
 
@@ -135,6 +159,87 @@ namespace rodri_movie_mvc.Controllers
             return View(usuarioVM);
         }
 
+        [Authorize]
+        public async Task<IActionResult> Panel()
+        {
+            var roles = _roleManager.Roles.ToList();
+            ViewBag.Roles = new SelectList(roles, "Name", "Name");
+
+            var usuarios = _userManager.Users.ToList();
+            ViewBag.Usuarios = new SelectList(usuarios, "Id", "UserName");
+
+            var panelUsuarios = new List<PanelUsViewModel>();
+
+            foreach (var usuario in usuarios)
+            {
+                var RolesUsuario = await _userManager.GetRolesAsync(usuario);
+                var panelUsuario = new PanelUsViewModel
+                {
+                    IdUsuario = Guid.Parse(usuario.Id),
+                    UserName = usuario.UserName,
+                    Email = usuario.Email,
+                    Roles = RolesUsuario.ToList()
+                };
+                panelUsuarios.Add(panelUsuario);
+            }
+
+            ViewBag.UsuariosRoles = panelUsuarios;
+
+            return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> CreateRole(string rol)
+        {
+            if(rol is null) return NotFound();
+            rol = rol.Trim();
+            rol = rol.ToLower();
+            if(await _roleManager.RoleExistsAsync(rol))
+            {
+                ViewBag.ErrorMsg = "Rol ya existente";
+                ViewBag.Rol = rol;
+                return View("Panel");
+            }
+            await _roleManager.CreateAsync(new IdentityRole(rol));
+            TempData["SuccessMsg"] = "Rol creado exitosamente";
+
+            return RedirectToAction("Panel");
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignRole(PanelUsViewModel PanelUsuario)
+        {
+            if (PanelUsuario is null) return NotFound();
+            var Usuario = await _userManager.FindByIdAsync(PanelUsuario.IdUsuario.ToString());
+            await _userManager.AddToRoleAsync(Usuario, PanelUsuario.RolSelec);
+
+            return RedirectToAction("Panel");
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(PanelUsViewModel PanelUsuario)
+        {
+            if (PanelUsuario is null) return NotFound();
+            var Usuario = await _userManager.FindByIdAsync(PanelUsuario.IdUsuario.ToString());
+            var token = await _userManager.GeneratePasswordResetTokenAsync(Usuario);
+            var result = await _userManager.ResetPasswordAsync(Usuario, token, "nuevo");
+            TempData["resetPassMsg"] = "No se pudo cambiar la contraseña";
+            if (result.Succeeded)
+            {
+                TempData["resetPassMsg"] = "Contraseña cambiada exitosamente.";
+            }
+            return RedirectToAction("Panel");
+        }
+
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
 
         private bool validarClave(string clave, string confirmar)
         {

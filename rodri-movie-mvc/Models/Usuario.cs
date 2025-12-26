@@ -57,6 +57,25 @@ namespace rodri_movie_mvc.Models
         [EmailAddress]
         [Required]
         public string? Email { get; set; }
+        public IFormFile? ImagenFilePerfil { get; set; }
         public string? ImagenUrlPerfil { get; set; }
+    }
+
+    public class PanelUsViewModel
+    {
+        [Required]
+        public Guid IdUsuario { get; set; }
+        [Required]
+        public Guid IdRol { get; set; }
+
+        public string UserName { get; set; }
+
+        [EmailAddress]
+        public string Email { get; set; }
+
+        public string? RolSelec { get; set; }
+
+        public List<string>? Roles { get; set; }
+
     }
 }

@@ -21,7 +21,7 @@
     </section>
     <section class="puntaje row mb-lg-4">
         <div class="portada col-lg-3"></div>
-        <div class="bg-dark p-4 d-flex col-lg-8 card flex-row justify-content-between" data-bs-theme="dark">
+        <div class="bg-dark p-4 d-flex col-lg-8 mb-lg-2 card flex-row justify-content-between" data-bs-theme="dark">
             <div class="card-body">
                 <h5 class="card-title">4.5</h5>
                 <p class="card-text">* * * * *</p>
@@ -60,11 +60,41 @@
                 </div>
             </div>
         </div>
+        <div class="row cont-botonera-res">
+            <div class="portada col-lg-3"></div>
+            <div class="col-lg-8"><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal-res">Crear reseña</button></div>
+        </div>
     </section>
     <section class="row">
         <div class="portada col-lg-3"></div>
         <div class="contenedor-cards col-lg-8">
+            @if (TempData["ReviewExiste"] is not null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show">
+                    @TempData["ReviewExiste"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
             <h3>Reviews</h3>
+            @foreach (var review in Model.ListaReviews)
+            {
+
+                string rating = "";
+                for (int i = 0; i < review.Rating; i++)
+                {
+                    rating += "* ";
+                }
+
+                <div class="card bg-dark mb-3 w-75" data-bs-theme="dark">
+                    <div class="card-body">
+                        <h5 class="card-title">@review.Usuario.Nombre @review.Usuario.Apellido</h5>
+                        <p class="card-text">@rating</p>
+                        <p class="card-text">
+                            @review.Comentario
+                        </p>
+                    </div>
+                </div>
+            }
             <div class="card bg-dark mb-3 w-75" data-bs-theme="dark">
                 <div class="card-body">
                     <h5 class="card-title">Marta Garcia</h5>
@@ -77,3 +107,11 @@
         </div>
     </section>
 </article>
+@{
+    var reviewCreateVM = new ReviewCreateViewModel
+            {
+                PeliculaId = Model.Id,
+                PeliculaTitulo = Model.Titulo
+            };
+}
+<partial name="~/Views/Review/_CreateReview.cshtml" model="reviewCreateVM" />

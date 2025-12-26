@@ -67,10 +67,19 @@
         cursor: pointer;
         transition: all 0.2s ease-in-out;
     }
+
+    .profileImage {
+        background: linear-gradient(to right,rgb(54, 54, 54),rgb(32, 32, 32));
+        margin-top: 20px;
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.329);
+    }
 </style>
 
 <section class="d-flex justify-content-center">
-    <form asp-action="Perfil" method="post" class="form">
+    <form asp-action="Perfil" method="post" enctype="multipart/form-data" class="form">
         @if(ViewBag.Mensaje is not null)
         {
             <div class="alert alert-success" role="alert">
@@ -80,6 +89,12 @@
         }
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <span class="title">Mi perfil</span>
+        <div class="d-flex justify-content-center mb-3">
+            <div class="profileImage">
+                <img class="img-fluid" id="profileImage" src="@Model.ImagenUrlPerfil" alt="Alternate Text" />
+            </div>
+        </div>
+        <input class="form-control mb-2" type="file" asp-for="ImagenFilePerfil" name="ImagenFilePerfil" accept="image/png,image/webp" onchange="previewImage(this)" />
         <label asp-for="Nombre" class="label"></label>
         <input asp-for="Nombre" type="text" name="Nombre" class="input">
         <span asp-validation-for="Nombre" class="text-danger"></span>
@@ -92,3 +107,14 @@
         <button type="submit" class="submit">Actualizar</button>
     </form>
 </section>
+<script>
+    function previewImage(input) {
+        if(input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("profileImage").src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        };
+    }
+</script>

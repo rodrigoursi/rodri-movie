@@ -1,0 +1,136 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model PanelUsViewModel
+@{
+    ViewData["Title"] = "Administración de Roles";
+    var usuarios = ViewBag.Usuarios;
+    var roles = ViewBag.Roles;
+    var usuariosRoles = ViewBag.UsuariosRoles;
+}
+
+<h2 class="mb-4 text-primary">Administración de Roles</h2>
+
+<section class="row">
+
+    <!-- ==========================
+         CREAR NUEVO ROL
+         ========================== -->
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                Crear nuevo rol
+            </div>
+            <div class="card-body">
+
+                <form method="post" asp-action="CreateRole">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del rol</label>
+                        <input type="text" class="form-control" name="rol" value="@ViewBag.Rol" placeholder="Ej.: Admin" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        Crear rol
+                    </button>
+                    @if (TempData["SuccessMsg"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                            @TempData["SuccessMsg"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (ViewBag.ErrorMsg != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                            @ViewBag.ErrorMsg
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                </form>
+
+                @* @if (ViewBag.RoleMessage != null)
+                {
+                        <div class="alert alert-info mt-3">@ViewBag.RoleMessage</div>
+                } *@
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================
+        ASIGNAR ROL A USUARIO
+        ========================== -->
+    <div class="col-md-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                Asignar rol a usuario
+            </div>
+            <div class="card-body">
+
+                <form method="post" asp-action="AssignRole">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Usuario</label>
+                        <select class="form-select" asp-for="IdUsuario" asp-items="@usuarios"></select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Rol</label>
+                        <select class="form-select" asp-for="RolSelec" asp-items="@roles"></select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        Asignar rol
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (PanelUsViewModel u in usuariosRoles)
+            {
+                <tr>
+                    <td>@u.UserName</td>
+                    <td>@u.Email</td>
+                    <td>
+                        @if (u.Roles != null && u.Roles.Count > 0)
+                        {
+                            <span class="badge bg-primary">@string.Join(", ", u.Roles)</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin rol</span>
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="ResetPassword" method="post" class="d-inline">
+                            <input type="hidden" asp-for="IdUsuario" value="@u.IdUsuario" />
+
+                            <button type="submit" class="btn btn-warning btn-sm"
+                                    onclick="return confirm('¿Seguro que quieres resetear la contraseña de este usuario?');">
+                                Reset Password
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="alert alert-secondary alert-dismissible fade show mt-3" role="alert">
+        @TempData["resetPassMsg"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+</section>

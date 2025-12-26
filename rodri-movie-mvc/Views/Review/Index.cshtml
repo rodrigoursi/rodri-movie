@@ -1,0 +1,36 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<Review>
+
+<section>
+    @foreach (var review in Model)
+    {
+        string rating = "";
+        @for (int i = 0; i < review.Rating; i++)
+        {
+            rating += "*";
+        }
+        <div class="row mb-3 w-50">
+            <div class="card bg-dark col-lg-9" data-bs-theme="dark">
+                <div class="card-body">
+                    <h5 class="card-title">@review.Pelicula.Titulo</h5>
+                    <p>fecha reseña: @review.FechaReview</p>
+                    <p class="card-text">@rating</p>
+                    <p class="card-text">
+                        @review.Comentario
+                    </p>
+                    <div class="w-25"><a asp-action="Edit" asp-route-id="@review.Id" class="btn btn-outline-light">Editar</a></div>
+                </div>
+                
+                
+            </div>
+            <div class="col-lg-3 p-2"><img class="img-fluid" src="@review.Pelicula.PosterUrlPortada" /></div>
+        </div>
+        
+        
+    }
+
+</section>
